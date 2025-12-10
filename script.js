@@ -1,10 +1,8 @@
 const STORAGE_KEY = "todoList_v1";
 const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
-const prioritySelect = document.getElementById("priority-select");
-const categoryInput = document.getElementById("category-input");
-const dueDateInput = document.getElementById("due-date");
-const searchInput = document.getElementById("search-input");
+const dueDateInput = document.getElementById("todo-due");
+const prioritySelect = document.getElementById("todo-priority");
 
 const listEl = document.getElementById("todo-list");
 const countEl = document.getElementById("count");
@@ -13,7 +11,6 @@ const clearCompletedBtn = document.getElementById("clear-completed");
 
 let todos = [];
 let currentFilter = "all";
-let searchQuery = "";
 
 // Load & Save
 function saveTodos() {
@@ -31,34 +28,21 @@ function addTodo(text) {
     text,
     completed: false,
     priority: prioritySelect.value,
-    category: categoryInput.value || "",
     due: dueDateInput.value || "",
-    subtasks: [],
     order: todos.length
   });
   saveTodos();
   render();
 }
 
-// Toggle
+// Toggle Completion
 function toggleTodo(id) {
-  todos = todos.map(t =>
-    t.id === id ? { ...t, completed: !t.completed } : t
-  );
+  todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
   saveTodos();
   render();
 }
 
-// Edit
-function editTodo(id, newText) {
-  todos = todos.map(t =>
-    t.id === id ? { ...t, text: newText } : t
-  );
-  saveTodos();
-  render();
-}
-
-// Delete
+// Delete Todo
 function deleteTodo(id) {
   todos = todos.filter(t => t.id !== id);
   saveTodos();
@@ -72,97 +56,68 @@ function clearCompleted() {
   render();
 }
 
-// Search
-searchInput.addEventListener("input", e => {
-  searchQuery = e.target.value.toLowerCase();
-  render();
-});
-
-// Drag & Drop
-let draggedItem = null;
-
-listEl.addEventListener("dragstart", e => {
-  draggedItem = e.target;
-});
-
-listEl.addEventListener("dragover", e => {
-  e.preventDefault();
-  const target = e.target.closest("li");
-  if (target && target !== draggedItem) {
-    listEl.insertBefore(draggedItem, target);
-  }
-});
-
-listEl.addEventListener("dragend", () => {
-  const newOrder = Array.from(listEl.children).map((li, index) => ({
-    id: li.dataset.id,
-    order: index
-  }));
-  
-  todos = todos.map(t => {
-    const match = newOrder.find(n => n.id === t.id);
-    return { ...t, order: match.order };
-  });
-
-  todos.sort((a, b) => a.order - b.order);
-  saveTodos();
-});
-
-// Render
+// Render list
 function render() {
+  // Optionally sort / filter here (just simple all / active / completed)
   let filtered = [...todos];
-
   if (currentFilter === "active") filtered = filtered.filter(t => !t.completed);
   if (currentFilter === "completed") filtered = filtered.filter(t => t.completed);
 
-  // Search filter
-  filtered = filtered.filter(t => t.text.toLowerCase().includes(searchQuery));
-
-  filtered.sort((a, b) => a.order - b.order);
+  // sort by custom order
+  filtered.sort((a,b) => a.order - b.order);
 
   listEl.innerHTML = filtered.length === 0
-    ? `<li class="small">No tasks found</li>`
+    ? `<li class="small">No tasks — add one above!</li>`
     : filtered.map(t => `
-      <li class="todo-item ${t.completed ? "completed" : ""} ${t.priority}" data-id="${t.id}" draggable="true">
-        <div>
+      <li class="todo-item ${t.completed ? "completed" : ""}" data-id="${t.id}" draggable="true">
+        <div class="left">
           <input type="checkbox" class="todo-checkbox" ${t.completed ? "checked" : ""}>
           <span class="todo-text">${t.text}</span>
-          ${t.category ? `<span class="small">#${t.category}</span>` : ""}
-          ${t.due ? `<div class="due-date">Due: ${t.due}</div>` : ""}
+          ${t.due ? `<span class="todo-meta">Due: ${t.due}</span>` : ""}
         </div>
-
-        <div class="actions">
-          <button class="edit-btn" aria-label="Edit task"><i class="fa fa-edit"></i></button>
-          <button class="delete-btn" aria-label="Delete task"><i class="fa fa-trash"></i></button>
+        <div class="item-actions">
+          <button class="edit-btn" title="Edit"><i class="fa fa-edit"></i></button>
+          <button class="delete-btn" title="Delete"><i class="fa fa-trash"></i></button>
         </div>
       </li>
     `).join("");
 
   countEl.textContent = `${todos.filter(t => !t.completed).length} left`;
+  filterButtons.forEach(btn =>
+    btn.classList.toggle("active", btn.dataset.filter === currentFilter)
+  );
 }
 
 // Event Listeners
 form.addEventListener("submit", e => {
   e.preventDefault();
-  if (input.value.trim()) addTodo(input.value.trim());
+  const val = input.value.trim();
+  if (!val) return;
+  addTodo(val);
   input.value = "";
-  categoryInput.value = "";
   dueDateInput.value = "";
+  prioritySelect.value = "normal";
 });
 
 listEl.addEventListener("click", e => {
   const li = e.target.closest("li[data-id]");
   if (!li) return;
-
   const id = li.dataset.id;
 
-  if (e.target.closest(".todo-checkbox")) toggleTodo(id);
-
-  if (e.target.closest(".delete-btn")) deleteTodo(id);
-
-  if (e.target.closest(".edit-btn")) {
+  if (e.target.closest(".todo-checkbox")) {
+    toggleTodo(id);
+  } else if (e.target.closest(".delete-btn")) {
+    deleteTodo(id);
+  } else if (e.target.closest(".edit-btn")) {
     const newText = prompt("Edit task:", li.querySelector(".todo-text").textContent);
-    if (newText !== null) editTodo(id, newText.trim());
+    if (newText !== null) {
+      const clean = newText.trim();
+      if (clean) {
+        todos = todos.map(t => t.id === id ? { ...t, text: clean } : t);
+        saveTodos();
+        render();
+      }
+    }
   }
 });
 
@@ -175,5 +130,6 @@ filterButtons.forEach(btn =>
 
 clearCompletedBtn.addEventListener("click", clearCompleted);
 
+// Initialize
 loadTodos();
 render();
