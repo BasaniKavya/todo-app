@@ -3,37 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>To-Do • Pink Night</title>
+  <title>Kavya • To-Do (Blue Gradient)</title>
 
-  <!-- Link CSS -->
-  <link rel="stylesheet" href="style.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Optional: Google Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="app">
-    <div class="left-glow"></div>
-    <div class="right-glow"></div>
+    <div class="accent-left" aria-hidden="true"></div>
+    <div class="accent-right" aria-hidden="true"></div>
 
     <div class="container">
       <header class="app-header">
         <div>
-          <h1 class="brand">To-Do</h1>
-          <p class="lead">A small, elegant task manager — Pink Night theme</p>
+          <h1 class="brand">My Tasks</h1>
+          <p class="lead">Blue gradient • premium theme</p>
         </div>
         <div class="header-actions">
-          <button id="theme-toggle" aria-pressed="true" title="Theme">Pink</button>
+          <button id="theme-glow-toggle" class="ghost" title="Toggle glow">Glow</button>
         </div>
       </header>
 
       <section class="card" aria-labelledby="todo-heading">
         <h2 id="todo-heading" class="sr-only">To-Do App</h2>
 
-        <!-- Add task form -->
         <form id="todo-form" class="todo-form" aria-label="Add a new task">
           <input id="todo-input" type="text" placeholder="Add a new task and press Enter" aria-label="Task description" autocomplete="off">
-          <button id="add-btn" type="submit" aria-label="Add task">Add</button>
+          <button id="add-btn" type="submit" aria-label="Add task">
+            <i class="fa fa-plus"></i>
+          </button>
         </form>
 
-        <!-- Controls -->
         <div class="controls">
           <div class="filters" role="tablist" aria-label="Filter tasks">
             <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
@@ -47,19 +52,17 @@
           </div>
         </div>
 
-        <!-- Tasks list -->
         <ul id="todo-list" aria-live="polite"></ul>
 
         <p class="small tip">Tip: double-click a task to edit. Press <kbd>Esc</kbd> to cancel.</p>
       </section>
 
       <footer class="credits">
-        <small>Built by you • Saveable to your browser</small>
+        <small>Built by Kavya • No account required — stored locally</small>
       </footer>
     </div>
   </main>
 
-  <!-- Link JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
