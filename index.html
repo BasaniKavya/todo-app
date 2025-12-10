@@ -6,7 +6,12 @@
   <title>My Tasks • Blue-Aqua To-Do</title>
 
   <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-../…" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-…"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -24,11 +29,7 @@
           <p class="lead">Blue → Aqua premium • drag, sort, export & sync theme</p>
         </div>
 
-        <div class="header-actions">
-          <button id="theme-toggle" class="ghost" aria-pressed="false" title="Toggle theme">
-            <i class="fa fa-moon"></i>
-          </button>
-        </div>
+        <!-- (Optional: theme toggle / other controls) -->
       </header>
 
       <section class="card" aria-labelledby="todo-heading">
@@ -54,31 +55,19 @@
               <button class="filter-btn" data-filter="active" role="tab" aria-selected="false">Active</button>
               <button class="filter-btn" data-filter="completed" role="tab" aria-selected="false">Completed</button>
             </div>
-
-            <label class="sort-label" for="sort-select">Sort:</label>
-            <select id="sort-select" aria-label="Sort tasks">
-              <option value="manual">Manual</option>
-              <option value="due">Due date (earliest)</option>
-              <option value="priority">Priority (high → low)</option>
-              <option value="created">Newest first</option>
-            </select>
+            <!-- (Could add sort dropdown etc here) -->
           </div>
 
           <div class="right-controls">
             <div class="small" id="count">0 left</div>
-            <button class="ghost" id="export-btn" title="Export tasks (JSON)"><i class="fa fa-file-export"></i></button>
-            <label class="ghost file-label" title="Import tasks (JSON)">
-              <i class="fa fa-file-import"></i>
-              <input id="import-file" type="file" accept="application/json" class="file-input" aria-label="Import tasks file">
-            </label>
             <button class="clear-btn" id="clear-completed">Clear completed</button>
           </div>
         </div>
 
-        <!-- Task list (draggable/manual order default) -->
+        <!-- Task list -->
         <ul id="todo-list" aria-live="polite"></ul>
 
-        <p class="small tip">Tip: double-click a task to edit. Drag to reorder (when Sort = Manual).</p>
+        <p class="small tip">Tip: double-click a task to edit. Drag to reorder tasks.</p>
       </section>
 
       <footer class="credits"><small>Built by You • Local storage key: <code>todoList_v1</code></small></footer>
