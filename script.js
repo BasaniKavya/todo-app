@@ -1,4 +1,4 @@
-// ---------- script.js (enhanced) ----------
+// script.js — Blue Gradient (enhanced)
 const STORAGE_KEY = 'todoList_v1';
 const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
@@ -6,50 +6,49 @@ const listEl = document.getElementById('todo-list');
 const countEl = document.getElementById('count');
 const filterButtons = document.querySelectorAll('.filter-btn');
 const clearCompletedBtn = document.getElementById('clear-completed');
-const themeToggle = document.getElementById('theme-toggle');
+const glowToggle = document.getElementById('theme-glow-toggle');
 
 let todos = [];
 let currentFilter = 'all';
 
-// -------- storage ----------
-function saveTodos() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-}
-function loadTodos() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  todos = raw ? JSON.parse(raw) : [];
-}
+// storage
+function saveTodos(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(todos)); }
+function loadTodos(){ const raw = localStorage.getItem(STORAGE_KEY); todos = raw ? JSON.parse(raw) : []; }
 
-// -------- todo operations ----------
-function addTodo(text) {
+// operations
+function addTodo(text){
   todos.unshift({ id: Date.now().toString(), text, completed: false });
-  saveTodos();
-  render();
+  saveTodos(); render();
 }
-function toggleTodo(id) {
+function toggleTodo(id){
   todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
   saveTodos(); render();
 }
-function deleteTodo(id) {
+function deleteTodo(id){
   todos = todos.filter(t => t.id !== id);
   saveTodos(); render();
 }
-function clearCompleted() {
+function clearCompleted(){
   todos = todos.filter(t => !t.completed);
   saveTodos(); render();
 }
-function updateTodoText(id, newText) {
+function updateTodoText(id, newText){
   todos = todos.map(t => t.id === id ? { ...t, text: newText } : t);
   saveTodos(); render();
 }
 
-// -------- render ----------
-function render() {
+// small safe escape to avoid XSS in title attributes
+function escapeHtml(s = '') {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+}
+
+// render
+function render(){
   let filtered = todos;
   if (currentFilter === 'active') filtered = todos.filter(t => !t.completed);
   if (currentFilter === 'completed') filtered = todos.filter(t => t.completed);
 
-  if (filtered.length === 0) {
+  if (filtered.length === 0){
     listEl.innerHTML = `<li class="small">No tasks — add one above!</li>`;
   } else {
     listEl.innerHTML = filtered.map(t => `
@@ -59,24 +58,24 @@ function render() {
           <span class="todo-text" title="${escapeHtml(t.text)}">${escapeHtml(t.text)}</span>
         </div>
         <div class="item-actions">
-          <button class="delete-btn" aria-label="Delete task">Delete</button>
+          <button class="delete-btn" aria-label="Delete task">
+            <i class="fa fa-trash"></i>
+          </button>
         </div>
-      </li>`).join('');
+      </li>
+    `).join('');
   }
 
   countEl.textContent = `${todos.filter(t => !t.completed).length} left`;
+
   filterButtons.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.filter === currentFilter);
-    btn.setAttribute('aria-selected', btn.dataset.filter === currentFilter ? 'true' : 'false');
+    const isActive = btn.dataset.filter === currentFilter;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
   });
 }
 
-// small utility to avoid XSS via titles
-function escapeHtml(s = '') {
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
-}
-
-// -------- event listeners ----------
+// events
 form.addEventListener('submit', e => {
   e.preventDefault();
   const val = input.value.trim();
@@ -85,7 +84,6 @@ form.addEventListener('submit', e => {
   input.focus();
 });
 
-// delegated click handling for list
 listEl.addEventListener('click', e => {
   const li = e.target.closest('li[data-id]');
   if (!li) return;
@@ -95,10 +93,11 @@ listEl.addEventListener('click', e => {
     toggleTodo(id);
     return;
   }
-  if (e.target.matches('.delete-btn')) {
-    // small fade animation before removing
+  if (e.target.closest('.delete-btn')) {
+    // small fade animation
+    li.style.transition = 'opacity .16s ease, transform .16s ease';
     li.style.opacity = '0';
-    li.style.transform = 'translateY(8px)';
+    li.style.transform = 'translateY(10px)';
     setTimeout(() => deleteTodo(id), 160);
   }
 });
@@ -111,7 +110,6 @@ listEl.addEventListener('dblclick', e => {
   const span = li.querySelector('.todo-text');
   if (!span) return;
 
-  // create input
   const inputEdit = document.createElement('input');
   inputEdit.type = 'text';
   inputEdit.className = 'edit-input';
@@ -120,7 +118,6 @@ listEl.addEventListener('dblclick', e => {
   inputEdit.focus();
   inputEdit.setSelectionRange(inputEdit.value.length, inputEdit.value.length);
 
-  // handle keys
   const onKey = (ev) => {
     if (ev.key === 'Enter') {
       const newVal = inputEdit.value.trim();
@@ -134,7 +131,6 @@ listEl.addEventListener('dblclick', e => {
   };
   inputEdit.addEventListener('keydown', onKey);
 
-  // blur -> commit
   inputEdit.addEventListener('blur', () => {
     const newVal = inputEdit.value.trim();
     if (newVal) updateTodoText(id, newVal);
@@ -142,7 +138,7 @@ listEl.addEventListener('dblclick', e => {
     cleanup();
   });
 
-  function cleanup() {
+  function cleanup(){
     inputEdit.removeEventListener('keydown', onKey);
   }
 });
@@ -160,26 +156,23 @@ clearCompletedBtn.addEventListener('click', () => {
 
 // keyboard shortcut: N -> focus input
 document.addEventListener('keydown', (e) => {
-  if (e.key.toLowerCase() === 'n' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+  if (e.key.toLowerCase() === 'n' && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
     e.preventDefault();
     input.focus();
   }
 });
 
-// theme toggle (keeps as a simple label; palette is fixed to pink night)
-themeToggle?.addEventListener('click', () => {
-  // For now, it's a cosmetic toggle: simply animate glows on/off
-  const left = document.querySelector('.left-glow');
-  const right = document.querySelector('.right-glow');
-  if (left.style.opacity === '0') {
-    left.style.opacity = right.style.opacity = '.32';
-    themeToggle.setAttribute('aria-pressed','true');
-  } else {
-    left.style.opacity = right.style.opacity = '0';
-    themeToggle.setAttribute('aria-pressed','false');
-  }
+// glow toggle
+glowToggle?.addEventListener('click', () => {
+  const left = document.querySelector('.accent-left');
+  const right = document.querySelector('.accent-right');
+  if (!left || !right) return;
+  const off = left.style.opacity === '0';
+  left.style.opacity = off ? '.24' : '0';
+  right.style.opacity = off ? '.24' : '0';
+  glowToggle.classList.toggle('active', off);
 });
 
-// Initialize
+// init
 loadTodos();
 render();
