@@ -265,3 +265,46 @@ button:focus, input:focus{
   .todo-text{ max-width: calc(100% - 100px); }
   .card{ padding:.9rem; }
 }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+button, .filter-btn {
+  transition: background-color 0.2s, color 0.2s;
+}
+
+button:hover, .filter-btn:hover {
+  background-color: var(--accent);
+  color: #fff;
+}
+li.todo-item {
+  transition: background-color 0.2s;
+}
+li.todo-item:hover {
+  background: #f0f4ff;
+}
+:root {
+  --bg: #f6f8fa;
+  --card: #ffffff;
+  --text: #0f172a;
+  --accent: #4f46e5;
+  --muted: #6b7280;
+}
+
+[data-theme="dark"] {
+  --bg: #1e1e2e;
+  --card: #2e2e3e;
+  --text: #e0e0e0;
+  --accent: #8b5cf6;
+  --muted: #9ca3af;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* then use var(--card), var(--accent), var(--muted) elsewhere */
+
+
