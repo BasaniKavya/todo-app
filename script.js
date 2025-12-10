@@ -132,8 +132,8 @@ function render() {
         </div>
 
         <div class="actions">
-          <button class="edit-btn"><i class="fa fa-edit"></i></button>
-          <button class="delete-btn"><i class="fa fa-trash"></i></button>
+          <button class="edit-btn" aria-label="Edit task"><i class="fa fa-edit"></i></button>
+          <button class="delete-btn" aria-label="Delete task"><i class="fa fa-trash"></i></button>
         </div>
       </li>
     `).join("");
