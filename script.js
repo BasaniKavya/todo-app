@@ -1,187 +1,131 @@
-const STORAGE_KEY = "todoList_v1";
-const form = document.getElementById("todo-form");
 const input = document.getElementById("todo-input");
-const dueDateInput = document.getElementById("todo-due");
-const prioritySelect = document.getElementById("todo-priority");
+const form = document.getElementById("todo-form");
+const list = document.getElementById("todo-list");
+const countDisplay = document.getElementById("count");
+const clearCompleted = document.getElementById("clear-completed");
+const filterBtns = document.querySelectorAll(".filter-btn");
+const themeBtn = document.getElementById("theme-btn");
 
-const listEl = document.getElementById("todo-list");
-const countEl = document.getElementById("count");
-const filterButtons = document.querySelectorAll(".filter-btn");
-const clearCompletedBtn = document.getElementById("clear-completed");
+let tasks = [];
+let filter = "all";
 
-let todos = [];
-let currentFilter = "all";
+/* ================================
+   THEME SWITCHING
+================================== */
 
-let dragSrcEl = null;
-
-// Load & Save
-function saveTodos() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-}
-function loadTodos() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  todos = raw ? JSON.parse(raw) : [];
-}
-
-// Add Todo
-function addTodo(text) {
-  todos.unshift({
-    id: Date.now().toString(),
-    text,
-    completed: false,
-    priority: prioritySelect.value,
-    due: dueDateInput.value || "",
-    order: todos.length
-  });
-  saveTodos();
-  render();
+function loadTheme() {
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "light") {
+    document.body.classList.add("light");
+    themeBtn.innerHTML = `<i class="fa fa-sun"></i>`;
+  }
 }
 
-// Toggle, Delete, Edit
-function toggleTodo(id) {
-  todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-  saveTodos();
-  render();
-}
-function deleteTodo(id) {
-  todos = todos.filter(t => t.id !== id);
-  saveTodos();
-  render();
-}
+themeBtn.onclick = () => {
+  document.body.classList.toggle("light");
 
-// Clear Completed
-function clearCompleted() {
-  todos = todos.filter(t => !t.completed);
-  saveTodos();
-  render();
-}
+  if (document.body.classList.contains("light")) {
+    themeBtn.innerHTML = `<i class="fa fa-sun"></i>`;
+    localStorage.setItem("theme", "light");
+  } else {
+    themeBtn.innerHTML = `<i class="fa fa-moon"></i>`;
+    localStorage.setItem("theme", "dark");
+  }
+};
 
-// Render
+loadTheme();
+
+
+/* ================================
+   TASK FUNCTIONS
+================================== */
+
 function render() {
-  // filter
-  let filtered = [...todos];
-  if (currentFilter === "active") filtered = filtered.filter(t => !t.completed);
-  if (currentFilter === "completed") filtered = filtered.filter(t => t.completed);
+  list.innerHTML = "";
 
-  // sort by order
-  filtered.sort((a,b) => a.order - b.order);
+  const filtered = tasks.filter(t =>
+    filter === "all"
+      ? true
+      : filter === "active"
+      ? !t.completed
+      : t.completed
+  );
 
-  listEl.innerHTML = filtered.length === 0
-    ? `<li class="small">No tasks — add one above!</li>`
-    : filtered.map(t => `
-      <li class="todo-item ${t.completed ? "completed" : ""}"
-        data-id="${t.id}" draggable="true">
-        <div class="left">
-          <input type="checkbox" class="todo-checkbox" ${t.completed ? "checked" : ""}>
-          <span class="todo-text">${t.text}</span>
-          ${t.due ? `<span class="todo-meta">Due: ${t.due}</span>` : ""}
-        </div>
-        <div class="item-actions">
-          <button class="edit-btn" title="Edit"><i class="fa fa-edit"></i></button>
-          <button class="delete-btn" title="Delete"><i class="fa fa-trash"></i></button>
-        </div>
-      </li>
-    `).join("");
+  filtered.forEach(task => {
+    const li = document.createElement("li");
+    li.className = "todo-item" + (task.completed ? " completed" : "");
 
-  countEl.textContent = `${todos.filter(t => !t.completed).length} left`;
+    li.innerHTML = `
+      <span class="todo-text" ondblclick="editTask(${task.id})">${task.text}</span>
+      <button class="edit-btn" onclick="editTask(${task.id})"><i class="fa fa-edit"></i></button>
+      <button class="delete-btn" onclick="deleteTask(${task.id})"><i class="fa fa-trash"></i></button>
+    `;
 
-  // attach drag handlers
-  addDragAndDrop();
+    li.onclick = e => {
+      if (e.target.classList.contains("fa")) return;
+      toggleComplete(task.id);
+    };
+
+    list.appendChild(li);
+  });
+
+  updateCount();
 }
 
-// Event Listeners
+function updateCount() {
+  const activeCount = tasks.filter(t => !t.completed).length;
+  countDisplay.textContent = `${activeCount} left`;
+}
+
 form.addEventListener("submit", e => {
   e.preventDefault();
-  const val = input.value.trim();
-  if (!val) return;
-  addTodo(val);
+  const text = input.value.trim();
+  if (!text) return;
+
+  tasks.push({
+    id: Date.now(),
+    text,
+    completed: false
+  });
+
   input.value = "";
-  dueDateInput.value = "";
-  prioritySelect.value = "normal";
+  render();
 });
 
-listEl.addEventListener("click", e => {
-  const li = e.target.closest("li[data-id]");
-  if (!li) return;
-  const id = li.dataset.id;
+function toggleComplete(id) {
+  tasks = tasks.map(t =>
+    t.id === id ? { ...t, completed: !t.completed } : t
+  );
+  render();
+}
 
-  if (e.target.closest(".todo-checkbox")) {
-    toggleTodo(id);
-  } else if (e.target.closest(".delete-btn")) {
-    deleteTodo(id);
-  } else if (e.target.closest(".edit-btn")) {
-    const newText = prompt("Edit task:", li.querySelector(".todo-text").textContent);
-    if (newText !== null) {
-      const clean = newText.trim();
-      if (clean) {
-        todos = todos.map(t => t.id === id ? { ...t, text: clean } : t);
-        saveTodos();
-        render();
-      }
-    }
-  }
-});
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  render();
+}
 
-filterButtons.forEach(btn =>
+function editTask(id) {
+  const newText = prompt("Edit task:");
+  if (!newText) return;
+
+  tasks = tasks.map(t =>
+    t.id === id ? { ...t, text: newText } : t
+  );
+  render();
+}
+
+filterBtns.forEach(btn =>
   btn.addEventListener("click", () => {
-    currentFilter = btn.dataset.filter;
+    filterBtns.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    filter = btn.dataset.filter;
     render();
   })
 );
 
-clearCompletedBtn.addEventListener("click", clearCompleted);
+clearCompleted.onclick = () => {
+  tasks = tasks.filter(t => !t.completed);
+  render();
+};
 
-// Drag & Drop reordering functions
-function addDragAndDrop() {
-  const items = listEl.querySelectorAll('li.todo-item');
-  items.forEach(item => {
-    item.addEventListener('dragstart', handleDragStart);
-    item.addEventListener('dragover', handleDragOver);
-    item.addEventListener('dragenter', handleDragEnter);
-    item.addEventListener('dragleave', handleDragLeave);
-    item.addEventListener('drop', handleDrop);
-    item.addEventListener('dragend', handleDragEnd);
-  });
-}
-function handleDragStart(e) {
-  dragSrcEl = e.currentTarget;
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', dragSrcEl.dataset.id);
-  dragSrcEl.classList.add('dragging');
-}
-function handleDragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-}
-function handleDragEnter(e) {
-  if (e.currentTarget !== dragSrcEl) {
-    e.currentTarget.classList.add('drop-target');
-  }
-}
-function handleDragLeave(e) {
-  e.currentTarget.classList.remove('drop-target');
-}
-function handleDrop(e) {
-  e.stopPropagation();
-  const srcId = e.dataTransfer.getData('text/plain');
-  const destId = e.currentTarget.dataset.id;
-  if (srcId !== destId) {
-    const srcIndex = todos.findIndex(t => t.id === srcId);
-    const destIndex = todos.findIndex(t => t.id === destId);
-    // swap order
-    const tmp = todos[srcIndex].order;
-    todos[srcIndex].order = todos[destIndex].order;
-    todos[destIndex].order = tmp;
-    saveTodos();
-    render();
-  }
-}
-function handleDragEnd(e) {
-  e.currentTarget.classList.remove('dragging');
-  listEl.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
-}
-
-// Init
-loadTodos();
 render();
-
