@@ -3,76 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>My Tasks • Blue-Aqua To-Do</title>
+  <title>To-Do List | Premium Theme</title>
 
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    integrity="sha512-…"
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 
-  <link rel="stylesheet" href="style.css" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
+
 <body>
-  <main class="app" id="app-root">
-    <div class="accent-left" aria-hidden="true"></div>
-    <div class="accent-right" aria-hidden="true"></div>
+  <div class="theme-toggle">
+    <button id="theme-btn"><i class="fa fa-moon"></i></button>
+  </div>
 
-    <div class="container">
-      <header class="app-header">
-        <div>
-          <h1 class="brand">My Tasks</h1>
-          <p class="lead">Blue → Aqua premium • drag, sort, export & sync theme</p>
+  <div class="container">
+    <header>
+      <h1>To-Do List</h1>
+      <p class="lead">A premium styled task manager.</p>
+    </header>
+
+    <section class="card">
+      <form id="todo-form">
+        <input id="todo-input" type="text" placeholder="Add a new task..." autocomplete="off">
+        <button id="add-btn" type="submit"><i class="fa fa-plus"></i></button>
+      </form>
+
+      <div class="controls">
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="active">Active</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
         </div>
 
-        <!-- (Optional: theme toggle / other controls) -->
-      </header>
+        <div class="small" id="count">0 left</div>
+        <button class="clear-btn" id="clear-completed">Clear completed</button>
+      </div>
 
-      <section class="card" aria-labelledby="todo-heading">
-        <h2 id="todo-heading" class="sr-only">To-Do App</h2>
+      <ul id="todo-list"></ul>
 
-        <!-- Add Task -->
-        <form id="todo-form" class="todo-form" aria-label="Add a new task">
-          <input id="todo-input" type="text" placeholder="Add a new task..." aria-label="Task description" autocomplete="off" required>
-          <input id="todo-due" type="date" aria-label="Due date">
-          <select id="todo-priority" aria-label="Priority">
-            <option value="normal">Normal</option>
-            <option value="high">High</option>
-            <option value="low">Low</option>
-          </select>
-          <button id="add-btn" type="submit" aria-label="Add task"><i class="fa fa-plus"></i></button>
-        </form>
-
-        <!-- Controls: filters + sort + clear completed -->
-        <div class="controls controls-top">
-          <div class="left-controls">
-            <div class="filters" role="tablist" aria-label="Filter tasks">
-              <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
-              <button class="filter-btn" data-filter="active" role="tab" aria-selected="false">Active</button>
-              <button class="filter-btn" data-filter="completed" role="tab" aria-selected="false">Completed</button>
-            </div>
-            <!-- (Could add sort dropdown etc here) -->
-          </div>
-
-          <div class="right-controls">
-            <div class="small" id="count">0 left</div>
-            <button class="clear-btn" id="clear-completed">Clear completed</button>
-          </div>
-        </div>
-
-        <!-- Task list -->
-        <ul id="todo-list" aria-live="polite"></ul>
-
-        <p class="small tip">Tip: double-click a task to edit. Drag to reorder tasks.</p>
-      </section>
-
-      <footer class="credits"><small>Built by You • Local storage key: <code>todoList_v1</code></small></footer>
-    </div>
-  </main>
+      <p class="small">Tip: Double-click to edit.</p>
+    </section>
+  </div>
 
   <script src="script.js"></script>
 </body>
