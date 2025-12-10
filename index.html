@@ -5,16 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Kavya • To-Do (Blue Gradient)</title>
 
-  <!-- Font Awesome for icons -->
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-  <!-- Optional: Google Inter font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="app">
+  <main class="app" id="app-root">
     <div class="accent-left" aria-hidden="true"></div>
     <div class="accent-right" aria-hidden="true"></div>
 
@@ -22,44 +20,67 @@
       <header class="app-header">
         <div>
           <h1 class="brand">My Tasks</h1>
-          <p class="lead">Blue gradient • premium theme</p>
+          <p class="lead">Blue→Aqua premium • drag, sort, export & sync theme</p>
         </div>
+
         <div class="header-actions">
-          <button id="theme-glow-toggle" class="ghost" title="Toggle glow">Glow</button>
+          <button id="theme-toggle" class="ghost" aria-pressed="false" title="Toggle theme">
+            <i class="fa fa-moon"></i>
+          </button>
         </div>
       </header>
 
       <section class="card" aria-labelledby="todo-heading">
         <h2 id="todo-heading" class="sr-only">To-Do App</h2>
 
+        <!-- Add Task (includes due date + priority) -->
         <form id="todo-form" class="todo-form" aria-label="Add a new task">
-          <input id="todo-input" type="text" placeholder="Add a new task and press Enter" aria-label="Task description" autocomplete="off">
-          <button id="add-btn" type="submit" aria-label="Add task">
-            <i class="fa fa-plus"></i>
-          </button>
+          <input id="todo-input" type="text" placeholder="Add a new task..." aria-label="Task description" autocomplete="off" required>
+          <input id="todo-due" type="date" aria-label="Due date">
+          <select id="todo-priority" aria-label="Priority">
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select>
+          <button id="add-btn" type="submit" aria-label="Add task"><i class="fa fa-plus"></i></button>
         </form>
 
-        <div class="controls">
-          <div class="filters" role="tablist" aria-label="Filter tasks">
-            <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
-            <button class="filter-btn" data-filter="active" role="tab" aria-selected="false">Active</button>
-            <button class="filter-btn" data-filter="completed" role="tab" aria-selected="false">Completed</button>
+        <!-- Controls: filters + sort + export/import + clear -->
+        <div class="controls controls-top">
+          <div class="left-controls">
+            <div class="filters" role="tablist" aria-label="Filter tasks">
+              <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">All</button>
+              <button class="filter-btn" data-filter="active" role="tab" aria-selected="false">Active</button>
+              <button class="filter-btn" data-filter="completed" role="tab" aria-selected="false">Completed</button>
+            </div>
+
+            <label class="sort-label" for="sort-select">Sort:</label>
+            <select id="sort-select" aria-label="Sort tasks">
+              <option value="manual">Manual</option>
+              <option value="due">Due date (earliest)</option>
+              <option value="priority">Priority (high → low)</option>
+              <option value="created">Newest first</option>
+            </select>
           </div>
 
           <div class="right-controls">
             <div class="small" id="count">0 left</div>
+            <button class="ghost" id="export-btn" title="Export tasks (JSON)"><i class="fa fa-file-export"></i></button>
+            <label class="ghost file-label" title="Import tasks (JSON)">
+              <i class="fa fa-file-import"></i>
+              <input id="import-file" type="file" accept="application/json" class="file-input" aria-label="Import tasks file">
+            </label>
             <button class="clear-btn" id="clear-completed">Clear completed</button>
           </div>
         </div>
 
+        <!-- Task list (draggable) -->
         <ul id="todo-list" aria-live="polite"></ul>
 
-        <p class="small tip">Tip: double-click a task to edit. Press <kbd>Esc</kbd> to cancel.</p>
+        <p class="small tip">Tip: double-click a task to edit. Drag to reorder (when Sort = Manual). Press <kbd>N</kbd> to focus input.</p>
       </section>
 
-      <footer class="credits">
-        <small>Built by Kavya • No account required — stored locally</small>
-      </footer>
+      <footer class="credits"><small>Built by Kavya • Local storage key: <code>todoList_v1</code></small></footer>
     </div>
   </main>
 
