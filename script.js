@@ -4,41 +4,9 @@ const list = document.getElementById("todo-list");
 const countDisplay = document.getElementById("count");
 const clearCompleted = document.getElementById("clear-completed");
 const filterBtns = document.querySelectorAll(".filter-btn");
-const themeBtn = document.getElementById("theme-btn");
 
 let tasks = [];
 let filter = "all";
-
-/* ================================
-   THEME SWITCHING
-================================== */
-
-function loadTheme() {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "light") {
-    document.body.classList.add("light");
-    themeBtn.innerHTML = `<i class="fa fa-sun"></i>`;
-  }
-}
-
-themeBtn.onclick = () => {
-  document.body.classList.toggle("light");
-
-  if (document.body.classList.contains("light")) {
-    themeBtn.innerHTML = `<i class="fa fa-sun"></i>`;
-    localStorage.setItem("theme", "light");
-  } else {
-    themeBtn.innerHTML = `<i class="fa fa-moon"></i>`;
-    localStorage.setItem("theme", "dark");
-  }
-};
-
-loadTheme();
-
-
-/* ================================
-   TASK FUNCTIONS
-================================== */
 
 function render() {
   list.innerHTML = "";
@@ -111,6 +79,7 @@ function editTask(id) {
   tasks = tasks.map(t =>
     t.id === id ? { ...t, text: newText } : t
   );
+
   render();
 }
 
