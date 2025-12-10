@@ -140,3 +140,45 @@ button:focus, input:focus{ box-shadow: 0 10px 40px rgba(46,161,255,0.09); transf
   #todo-due, #todo-priority{ display:none; }
   .todo-text{ max-width:calc(100% - 120px); }
 }
+/* Search bar */
+#search-input {
+  width: 100%;
+  padding: .6rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid #2b2b2b;
+  background: #0d0d0d;
+  color: white;
+}
+
+/* Priority colors */
+.todo-item.low { border-left: 4px solid #3b82f6; }
+.todo-item.medium { border-left: 4px solid #facc15; }
+.todo-item.high { border-left: 4px solid #ef4444; }
+
+/* Due date */
+.due-date {
+  font-size: .75rem;
+  color: #9ca3af;
+}
+
+/* Edit/Delete Icons */
+.actions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #60a5fa;
+}
+
+.actions button:hover {
+  color: white;
+}
+
+/* Drag handle */
+.todo-item {
+  cursor: grab;
+}
+.todo-item:active {
+  cursor: grabbing;
+}
+
